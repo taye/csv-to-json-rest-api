@@ -1,4 +1,5 @@
 var csvToJson = require('./csvToJson');
+var server = require('./server');
 
 csvToJson('./data.csv', function (err, data) {
   if (err) {
@@ -6,5 +7,6 @@ csvToJson('./data.csv', function (err, data) {
     return;
   }
 
-  console.log(data);
+  // serve the data through the RESTful API
+  server.serve(data);
 });
