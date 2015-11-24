@@ -1,59 +1,25 @@
 var http = require('http');
+var requestFromUrl = require('./requestFromUrl');
 
-var endpointRE = /^\/incidents\/(.*)$/;
-var idRE = /^\d+$/;
-var districtRE = /district\/(.*)$/;
-var dateRE = /date\/(.*)$/;
-var postcodeRE = /postcode\/(.*)$/;
+/**
+ * Start a server to serve the data through a RESTful API.
+ *
+ * @param options object object with data and, optionally, port and host
+ *                       properties. Default to 8080 and 0.0.0.0
+ */
+module.exports.serve = function (options) {
+  options = options || {};
 
-function parseUrl (url) {
-  var endpointMatch = url.match(endpointRE);
+  var data = options.data;
+  var port = options.port || 8080;
+  var host = options.host || '0.0.0.0';
 
-  var request = { endpoint: null, param: null };
-
-  if (!endpointMatch) {
-    return request;
-  }
-
-  var endpoint = endpointMatch[1];
-
-  // if an ID is given
-  if (idRE.test(endpoint)) {
-    request.endpoint = 'id';
-    request.param = endpoint;
-  }
-  // date endpoint
-  else if (endpoint.indexOf('date') === 0) {
-    request.endpoint = 'date';
-
-    var dateMatch = endpoint.match(dateRE);
-    request.param = dateMatch && dateMatch[1];
-  }
-  // date endpoint
-  else if (endpoint.indexOf('district') === 0) {
-    request.endpoint = 'district';
-
-    var districtMatch = endpoint.match(districtRE);
-    request.param = districtMatch && districtMatch[1];
-  }
-  // postcode endpoint
-  else if (endpoint.indexOf('postcode') === 0) {
-    request.endpoint = 'postcode';
-
-    var postcodeMatch = endpoint.match(postcodeRE);
-    request.param = postcodeMatch && postcodeMatch[1];
-  }
-
-  return request;
-}
-
-
-module.exports.serve = function (data) {
   // Create an HTTP server
   var server = http.createServer(function (req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    // The server always serves a JSON response
+    res.writeHead(200, { 'Content-Type': 'application/json' });
 
-    var request = parseUrl(req.url);
+    var request = requestFromUrl(req.url);
     console.log("serving request:", request);
 
     var result;
@@ -68,20 +34,21 @@ module.exports.serve = function (data) {
     }
     else if (request.endpoint === 'district') {
       result = data.filter(function (incident) {
-        return incident.district === request.district;
+        return incident.district === request.param;
       });
     }
     else if (request.endpoint === 'postcode') {
       result = data.filter(function (incident) {
-        return incident.postcode === request.postcode;
+        return incident.postcode === request.param;
       });
     }
 
-    res.write(JSON.stringify(result || null));
-    res.end('');
+    res.end(JSON.stringify(result || null));
   });
 
-  server.listen(8080, '127.0.0.1', function() {
-    console.log('Started server');
+  server.listen(port, host, function() {
+    console.log('Started server on ' + host + ':' + port);
   });
+
+  return server;
 };

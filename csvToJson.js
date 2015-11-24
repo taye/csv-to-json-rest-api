@@ -1,18 +1,19 @@
 /**
  * parse a CSV file and add an ID to each entry
- * @param file     sring    path to the CSV file
+ * @param options  object   options with file and optional beadings
  * @param callback function the function to be called on error or success.
  *                          first argument is the error if any,
  *                          second is the array of record objects
  */
-module.exports = function (file, callback) {
+module.exports = function (options, callback) {
   var fs = require('fs');
   var parse = require('csv-parse');
 
   // Create a CSV parser
   var parser = parse({delimiter: ',', comment: '#'});
 
-  // the keys taken from the csv table headings
+  // the keys for the record objects provided in options.headings or taken
+  // from the csv table headings
   var dataKeys;
   var recordLength;
   var records = [];
@@ -24,6 +25,12 @@ module.exports = function (file, callback) {
     // the first record will be an array of headings
     if (needHeadings) {
       var headings = parser.read();
+
+      // if alternative headings are supplied, discared the headings read
+      // fromt the file
+      if (options.headings) {
+        headings = options.headings;
+      }
 
       recordLength = headings.length;
 
@@ -65,7 +72,7 @@ module.exports = function (file, callback) {
     callback(null, records);
   });
 
-  fs.readFile(file, function (err, data) {
+  fs.readFile(options.file, function (err, data) {
     parser.write(data.toString());
 
     parser.end();
