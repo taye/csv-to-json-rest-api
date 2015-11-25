@@ -10,7 +10,7 @@ module.exports = function (options, callback) {
   var parse = require('csv-parse');
 
   // Create a CSV parser
-  var parser = parse({delimiter: ',', comment: '#'});
+  var parser = parse({delimiter: ','});
 
   // the keys for the record objects provided in options.headings or taken
   // from the csv table headings
@@ -70,9 +70,6 @@ module.exports = function (options, callback) {
     callback(null, records);
   });
 
-  fs.readFile(options.file, function (err, data) {
-    parser.write(data.toString());
-
-    parser.end();
-  });
+  // create a stream of the file and pipe it into the parser
+  fs.createReadStream(options.file).pipe(parser);
 };
