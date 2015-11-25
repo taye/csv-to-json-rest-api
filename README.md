@@ -1,7 +1,10 @@
+## Setup
+
 To set up the project, clone it and run `npm install`.
 
 To start the server on port `8080`, run `npm start`.
 
+## Server API
 
 |  endpoint                        | response |
 |----------------------------------|----------|
