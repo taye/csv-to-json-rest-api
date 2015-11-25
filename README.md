@@ -13,7 +13,7 @@ To start the server on port `8080`, run `npm start`.
 | `/incidents/district/{district}` | All incidents for a certain district (eg, TALLAGHT, KILMAINHAM) |
 | `/incidents/postcode/{postcode}` | All incidents in a postcode (D4, D2, D7, etc). |
 
-The response is an array of incidents or null if no matching incident is found. For example:
+The response is an array of incidents. For example:
 
 `/incidents/432`
 
