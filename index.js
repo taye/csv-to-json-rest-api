@@ -1,23 +1,25 @@
 var csvToJson = require('./csvToJson');
 var server = require('./server');
 
+var headings = [
+  'date',
+  'agency',
+  'postcode',
+  'district',
+  'toc',
+  'ord',
+  'mob',
+  'ia',
+  'ls',
+  'ah',
+  'mav',
+  'cd'
+];
+
 // convert the CSV file to JSON
 csvToJson({
   file: './data.csv',
-  headings: [
-    'date',
-    'agency',
-    'postcode',
-    'district',
-    'toc',
-    'ord',
-    'mob',
-    'ia',
-    'ls',
-    'ah',
-    'mav',
-    'cd'
-  ]
+  headings: headings
 },
   // on error or completion
   function (err, data) {
@@ -31,9 +33,12 @@ csvToJson({
     incident.date = incident.date.replace(/\//g, '-');
   });
 
-  // serve the data through the RESTful API
+  // Serve the data through the RESTful API. The keys option defines endpoint
+  // urls. Here, we allow all incident properties to be used
   server.serve({
     data: data,
+    keys: headings,
+    baseUrl: '/incidents/',
     port: 8080,
     host: '0.0.0.0'
   });

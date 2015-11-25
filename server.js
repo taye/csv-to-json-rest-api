@@ -1,16 +1,16 @@
 var http = require('http');
-var requestFromUrl = require('./requestFromUrl');
+var endpointFromUrl = require('./endpointFromUrl');
 
 /**
  * Start a server to serve the data through a RESTful API.
  *
- * @param options object object with data and, optionally, port and host
- *                       properties. Default to 8080 and 0.0.0.0
+ * @param options object object with data, endpoint keys, API baseUrl and,
+ *                       optionally, port and host properties. Default to 8080
+ *                       and 0.0.0.0
  */
 module.exports.serve = function (options) {
   options = options || {};
 
-  var data = options.data;
   var port = options.port || 8080;
   var host = options.host || '0.0.0.0';
 
@@ -19,31 +19,21 @@ module.exports.serve = function (options) {
     // The server always serves a JSON response
     res.writeHead(200, { 'Content-Type': 'application/json' });
 
-    var request = requestFromUrl(req.url);
-    console.log("serving request:", request);
+    var endpoint = endpointFromUrl(req.url, options.baseUrl, options.keys);
+    console.log("serving request:", endpoint);
 
-    var result;
+    var result = null;
 
-    if (request.endpoint === 'id') {
-      result = data[request.param];
-    }
-    else if (request.endpoint === 'date') {
-      result = data.filter(function (incident) {
-        return incident.date === request.param;
-      });
-    }
-    else if (request.endpoint === 'district') {
-      result = data.filter(function (incident) {
-        return incident.district === request.param;
-      });
-    }
-    else if (request.endpoint === 'postcode') {
-      result = data.filter(function (incident) {
-        return incident.postcode === request.param;
+    // if a vlid endpoint was matched
+    if (endpoint.key !== null) {
+      // filter the records by the requested key/value
+      result = options.data.filter(function (dataItem) {
+        return dataItem[endpoint.key] === endpoint.value;
       });
     }
 
-    res.end(JSON.stringify(result || null));
+    // write the JSON string of the result and end the response
+    res.end(JSON.stringify(result));
   });
 
   server.listen(port, host, function() {
