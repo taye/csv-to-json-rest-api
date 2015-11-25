@@ -44,7 +44,7 @@ csvToJson({
     // add id to the API endpoint keys and use it as the default endpoint
     keys: ['id'].concat(headings),
     baseUrl: '/incidents/',
-    port: 80,
+    port: 8080,
     host: '0.0.0.0'
   });
 });
