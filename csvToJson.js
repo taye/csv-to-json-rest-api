@@ -49,13 +49,11 @@ module.exports = function (options, callback) {
     while ((recordArray = parser.read())) {
       // Each record is read as an array of string values
       // An object is made for the record and appended to the records array
-      // Use the record's index in the array as an ID
-      var recordObject = { id: records.length };
+      var recordObject = {};
       records.push(recordObject);
 
-      // Each entry will have as properties: "id" and the strings in the
-      // dataKeys array. The values of those properties will be the
-      // corresponding record values
+      // Each entry will have as properties the strings in the dataKeys array.
+      // The values of those properties will be the corresponding record values
       for (var i = 0; i < recordLength; i++) {
         recordObject[dataKeys[i]] = recordArray[i];
       }

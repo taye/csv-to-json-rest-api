@@ -1,32 +1,30 @@
-var idRE = /^\d+$/;
-
 module.exports = function (url, baseUrl, keys) {
-  var request = { key: null, value: null };
+  var endpoint = { key: null, value: null };
 
-  // remove the baseUrl to get the endpoint key and value parameter
-  var endpoint = url.indexOf(baseUrl) !== -1 && url.substring(baseUrl.length);
+  // remove the baseUrl to get the request endpoint and value parameter
+  var request = url.indexOf(baseUrl) !== -1 && url.substring(baseUrl.length);
 
-  if (!endpoint) {
-    return request;
+  if (!request) {
+    return endpoint;
   }
 
-  // if an ID is given
-  if (idRE.test(endpoint)) {
-    request.key = 'id';
-    request.value = parseInt(endpoint);
-  }
   // general object key endpoints
-  else {
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
 
-      if (endpoint.indexOf(key) === 0) {
-        request.key = key;
-        request.value = endpoint.substring(key.length + 1 /* +1 for "/" */);
-        break;
-      }
+    if (request.indexOf(key) === 0) {
+      endpoint.key = key;
+      endpoint.value = request.substring(key.length + 1 /* +1 for "/" */);
+      break;
     }
   }
 
-  return request;
+  // if no endpoint was found assume a value for the first key in keys was
+  // provided
+  if (!endpoint.key) {
+    endpoint.key = keys[0];
+    endpoint.value = request;
+  }
+
+  return endpoint;
 };

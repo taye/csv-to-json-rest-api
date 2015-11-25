@@ -28,8 +28,12 @@ csvToJson({
     return;
   }
 
-  // change date separator from "/" to "-"
-  data.forEach(function (incident) {
+  // make some adjustments to the objects
+  data.forEach(function (incident, index) {
+    // give each incident an ID which is it's index in the data array
+    incident.id = index;
+
+    // change date separator from "/" to "-"
     incident.date = incident.date.replace(/\//g, '-');
   });
 
@@ -37,7 +41,8 @@ csvToJson({
   // urls. Here, we allow all incident properties to be used
   server.serve({
     data: data,
-    keys: headings,
+    // add id to the API endpoint keys and use it as the default endpoint
+    keys: ['id'].concat(headings),
     baseUrl: '/incidents/',
     port: 8080,
     host: '0.0.0.0'

@@ -28,7 +28,8 @@ module.exports.serve = function (options) {
     if (endpoint.key !== null) {
       // filter the records by the requested key/value
       result = options.data.filter(function (dataItem) {
-        return dataItem[endpoint.key] === endpoint.value;
+        // double equals comparison to allow casting number/string values
+        return dataItem[endpoint.key] == endpoint.value;
       });
     }
 
