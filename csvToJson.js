@@ -1,5 +1,5 @@
 /**
- * parse a CSV file and add an ID to each entry
+ * parse a CSV file and convert it to an array of objects
  * @param options  object   options with file and optional beadings
  * @param callback function the function to be called on error or success.
  *                          first argument is the error if any,
